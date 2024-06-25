@@ -60,7 +60,7 @@
       } else {
         newDevices.forEach((device) => {
           const item = document.createElement('li');
-          item.textContent = `New Local Device Detected: MAC ${device.mac}, IP ${device.ip}`;
+          item.textContent = `New Local Device Detected: IP ${device.ip}, MAC ${device.mac}`;
           newDevicesList.appendChild(item);
         });
       }
@@ -72,7 +72,7 @@
       allDevicesList.innerHTML = ''; // Clear previous list
       allDevices.forEach((device) => {
         const item = document.createElement('li');
-        item.textContent = `Local Device: MAC ${device.mac}, IP ${device.ip}`;
+        item.textContent = `Local Device: IP ${device.ip}, MAC ${device.mac}`;
         allDevicesList.appendChild(item);
       });
     });
@@ -94,4 +94,8 @@
   </script>
 </body>
 </html>
+
+
+
+
 

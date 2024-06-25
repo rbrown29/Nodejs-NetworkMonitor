@@ -11,11 +11,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "arpscan": "^1.0.2",
+    "bonjour": "^3.5.0",
     "express": "^4.19.2",
+    "net-ping": "^1.2.4",
     "node-arp": "^1.0.6",
     "node-wifi": "^2.0.16",
     "nodemon": "^3.1.4",
     "os": "^0.1.2",
+    "pcap": "^3.1.0",
     "pcap-parser": "^0.2.1",
     "socket.io": "^4.7.5",
     "wifi-scanner": "^0.0.4"
