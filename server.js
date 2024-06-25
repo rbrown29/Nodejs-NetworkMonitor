@@ -3,8 +3,8 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const { scanWifiNetworks } = require('./wifiScanner');
-const { startCapture } = require('./pcapScanner');
 const { startMonitoring } = require('./networkMonitor');
+const { startCapture } = require('./pcapCapture'); // Import the new pcapCapture module
 
 const app = express();
 const server = http.createServer(app);
@@ -36,12 +36,6 @@ io.on('connection', (socket) => {
     });
   }, 10000); // Scan every 10 seconds
 
-  // Start capturing packets
-  startCapture((packet) => {
-    console.log('Emitting packet:', packet);
-    socket.emit('packet', packet);
-  });
-
   // Monitor the local network for new devices and all devices
   startMonitoring((newDevices, allDevices) => {
     if (newDevices.length > 0) {
@@ -51,13 +45,17 @@ io.on('connection', (socket) => {
     socket.emit('newLocalDeviceAlert', newDevices);
     socket.emit('allLocalDevices', allDevices);
   });
+
+  // Start capturing packets
+  startCapture((packet) => {
+    if (packet.srcIp && packet.dstIp) {
+      console.log('Emitting packet:', packet);
+      socket.emit('packet', packet);
+    }
+  });
 });
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
-
-
-
-
 

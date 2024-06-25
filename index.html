@@ -20,7 +20,7 @@
     <ul id="new-local-devices"></ul>
     <h2>All Local Network Devices</h2>
     <ul id="all-local-devices"></ul>
-    <h2>WiFi Device Information</h2>
+    <h2>Packets</h2>
     <ul id="packets"></ul>
   </div>
 
@@ -84,7 +84,7 @@
 
       if (packets) {
         const item = document.createElement('li');
-        item.textContent = `Channel: ${packet.channel}, Frequency: ${packet.frequency} MHz, Signal Level: ${packet.signal_level} dBm, Quality: ${packet.quality}, Security: ${packet.security}, Security Flags: ${packet.security_flags.join(', ')}`;
+        item.textContent = `Src IP: ${packet.srcIp}, Dst IP: ${packet.dstIp}, Src Port: ${packet.srcPort}, Dst Port: ${packet.dstPort}, Protocol: ${packet.protocol}`;
         console.log('Packet item:', item);
         packets.appendChild(item);
       } else {
@@ -94,8 +94,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-

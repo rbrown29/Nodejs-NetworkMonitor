@@ -27,14 +27,9 @@ function getNetworkRange() {
   return range;
 }
 
-function getDeviceName(ip, callback) {
-  // Use arp to get the MAC address
+function getDeviceInfo(ip, callback) {
   arp.getMAC(ip, (err, mac) => {
-    if (err) {
-      callback(null);
-    } else {
-      callback(mac);
-    }
+    callback({ ip, mac: err ? null : mac });
   });
 }
 
@@ -47,13 +42,12 @@ function scanNetwork(callback) {
     session.pingHost(ip, (error, target) => {
       completedRequests++;
       if (!error) {
-        getDeviceName(target, (mac) => {
-          const device = { ip: target, mac: mac, name: null }; // Placeholder for name
-          if (!knownDevices.has(target)) {
-            knownDevices.set(target, device);
+        getDeviceInfo(target, (device) => {
+          if (!knownDevices.has(device.mac)) {
+            knownDevices.set(device.mac, device);
             newDevices.push(device);
           } else {
-            knownDevices.set(target, device);
+            knownDevices.set(device.mac, device);
           }
           // When all requests are completed, call the callback
           if (completedRequests === networkRange.length) {
