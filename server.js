@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const { scanWifiNetworks } = require('./wifiScanner');
 const { startCapture } = require('./pcapScanner');
+const { startMonitoring } = require('./networkMonitor');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,10 +28,10 @@ io.on('connection', (socket) => {
     scanWifiNetworks((networks, newDevices) => {
       socket.emit('wifiScanResults', networks);
 
-      // Emit an alert if new devices are detected
+      // Emit an alert if new WiFi devices are detected
       if (newDevices.length > 0) {
-        console.log('Emitting newDeviceAlert:', newDevices);
-        socket.emit('newDeviceAlert', newDevices);
+        console.log('Emitting newWiFiDeviceAlert:', newDevices);
+        socket.emit('newWiFiDeviceAlert', newDevices);
       }
     });
   }, 10000); // Scan every 10 seconds
@@ -40,8 +41,20 @@ io.on('connection', (socket) => {
     console.log('Emitting packet:', packet);
     socket.emit('packet', packet);
   });
+
+  // Monitor the local network for new devices and all devices
+  startMonitoring((newDevices, allDevices) => {
+    if (newDevices.length > 0) {
+      console.log('New local network devices detected:', newDevices);
+    }
+    console.log('All local network devices:', allDevices);
+    socket.emit('newLocalDeviceAlert', newDevices);
+    socket.emit('allLocalDevices', allDevices);
+  });
 });
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
+
+
