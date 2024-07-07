@@ -4,7 +4,7 @@ const arp = require('node-arp');
 
 const session = ping.createSession();
 let knownDevices = new Map();
-const interval = 60000; // 1 minute interval
+const interval = 20000; // 20 seconds
 
 function getLocalIP() {
   const ifaces = os.networkInterfaces();
