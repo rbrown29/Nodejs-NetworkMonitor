@@ -49,13 +49,12 @@ io.on('connection', (socket) => {
   // Start capturing packets
   startCapture((packet) => {
     if (packet.srcIp && packet.dstIp) {
-      console.log('Emitting packet:', packet);
       socket.emit('packet', packet);
     }
   });
 });
 
 server.listen(3000, () => {
-  console.log('listening on *:3000');
+  console.log('http://localhost:3000/');
 });
 
