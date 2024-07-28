@@ -1,23 +1,4 @@
-<style>
-    red {
-        color: rgb(235,33,46);
-    }
-    green {
-        color: #08ff08;
-    }
-    blue {
-        color: rgb(77,77,255);
-    }
-    yellow {
-        color: rgb(180, 255, 0);
-    }
-    black {
-        color: rgb(0, 0, 0);
-    }
-    purple {
-        color: rgb(128,49,167);
-    }
-</style>
+
 # :dragon: <green>NodeJS Network Monitor<green/>
 
 ### Author and Code design by Richard Brown
