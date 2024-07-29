@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NodeJs Network Monitor - WiFi</title>
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Nodejs Network Monitor</h1>
+      <button onclick="viewHome();">Back</button>
+    </div>
+  </header>
+  <div class="container">
+    <h2>WiFi Device Alerts</h2>
+    <ul id="alerts"></ul>
+    <h2>WiFi Networks</h2>
+    <ul id="networks"></ul>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    function viewHome() {
+      window.location.href = "/";
+    }
+
+    const socket = io();
+
+    socket.emit('startWifiScan');
+
+    socket.on("wifiScanResults", (networks) => {
+      const list = document.getElementById("networks");
+      list.innerHTML = "";
+      networks.forEach(network => {
+        const item = document.createElement("li");
+        item.textContent = `SSID: ${network.ssid}, Signal Level: ${network.signal_level} dBm, Channel: ${network.channel}, Frequency: ${network.frequency} MHz, Quality: ${network.quality}, Security: ${network.security}, Security Flags: ${network.security_flags.join(", ")}`;
+        list.appendChild(item);
+      });
+    });
+
+    socket.on("newWiFiDeviceAlert", (newDevices) => {
+      const alerts = document.getElementById("alerts");
+      alerts.innerHTML = "";
+      if (newDevices.length === 0) {
+        const item = document.createElement("li");
+        item.textContent = "No new devices";
+        alerts.appendChild(item);
+      } else {
+        newDevices.forEach(device => {
+          const item = document.createElement("li");
+          item.textContent = `New WiFi Device Detected: MAC ${
+            device.mac
+          }, SSID ${device.ssid}, Channel ${device.channel}, Frequency ${
+            device.frequency
+          } MHz, Signal Level ${device.signal_level} dBm, Quality ${
+            device.quality
+          }, Security ${
+            device.security
+          }, Security Flags ${device.security_flags.join(", ")}`;
+          alerts.appendChild(item);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,60 +1,77 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
-const { scanWifiNetworks } = require('./wifiScanner');
-const { startMonitoring } = require('./networkMonitor');
-const { startCapture } = require('./pcapCapture'); // Import the new pcapCapture module
+const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
+const path = require("path");
+const { scanWifiNetworks } = require("./wifiScanner");
+const { startMonitoring } = require("./networkMonitor");
+const { startCapture } = require("./pcapCapture");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+app.get("/packets", (req, res) => {
+  res.sendFile(path.join(__dirname, "packets.html"));
+});
+
+app.get("/wifi", (req, res) => {
+  res.sendFile(path.join(__dirname, "wifi.html"));
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 
-  // Periodically scan WiFi networks and emit results
-  setInterval(() => {
+  // Start WiFi scan when requested
+  socket.on("startWifiScan", () => {
+    console.log("Starting WiFi scan...");
     scanWifiNetworks((networks, newDevices) => {
-      socket.emit('wifiScanResults', networks);
-
-      // Emit an alert if new WiFi devices are detected
-      if (newDevices.length > 0) {
-        console.log('Emitting newWiFiDeviceAlert:', newDevices);
-        socket.emit('newWiFiDeviceAlert', newDevices);
-      }
+      socket.emit("wifiScanResults", networks);
+      socket.emit("newWiFiDeviceAlert", newDevices);
     });
-  }, 10000); // Scan every 10 seconds
-
-  // Monitor the local network for new devices and all devices
-  startMonitoring((newDevices, allDevices) => {
-    if (newDevices.length > 0) {
-      console.log('New local network devices detected:', newDevices);
-    }
-    console.log('All local network devices:', allDevices);
-    socket.emit('newLocalDeviceAlert', newDevices);
-    socket.emit('allLocalDevices', allDevices);
+    // Start periodic WiFi scan
+    setInterval(() => {
+      scanWifiNetworks((networks, newDevices) => {
+        socket.emit("newWiFiDeviceAlert", newDevices);
+        socket.emit("wifiScanResults", networks);
+      });
+    }, 10000); // Send time to client every 10 seconds
   });
 
-  // Start capturing packets
-  startCapture((packet) => {
-    if (packet.srcIp && packet.dstIp) {
-      socket.emit('packet', packet);
-    }
+  // Start packet capture when requested
+  socket.on("startPacketCapture", () => {
+    console.log("Starting packet capture...");
+    startCapture((packet) => {
+      socket.emit("packet", packet);
+    });
   });
+
+  // Start local network monitoring when requested
+  socket.on("startLocalNetworkMonitoring", () => {
+    console.log("Starting local network monitoring...");
+    startMonitoring((newDevices, allDevices) => {
+      socket.emit("newLocalDeviceAlert", newDevices);
+      socket.emit("allLocalDevices", allDevices);
+    });
+  });
+  // Start periodic local network monitoring
+  setInterval(() => {
+    startMonitoring((newDevices, allDevices) => {
+      socket.emit("newLocalDeviceAlert", newDevices);
+      socket.emit("allLocalDevices", allDevices);
+    });
+  }, 300000); // scan every 5 minutes
 });
 
 server.listen(3000, () => {
-  console.log('http://localhost:3000/');
+  console.log("Server is running on http://localhost:3000");
 });
-

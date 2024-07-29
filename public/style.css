@@ -6,6 +6,21 @@ body {
   padding: 0;
 }
 
+button {
+  background-color: rgba(180, 255, 0, 0.1);
+  border: 1px solid rgba(180, 255, 0, 0.2);
+  color: rgb(180, 255, 0); /* Neon Green/Yellow */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Syne Mono', monospace; /* Ensure consistent font */
+  margin-bottom: 20px; /* Adds space below the button */
+}
+
+button:hover {
+  background-color: rgba(180, 255, 0, 0.2); /* Slightly more intense background on hover */
+}
+
 h1 {
   text-align: center;
   color: rgb(180, 255, 0); /* Neon Green/Yellow */
@@ -67,8 +82,9 @@ header {
   background: rgb(0, 0, 0);
   color: #F2FF40;
   padding-top: 30px;
-  min-height: 70px;
+  padding-bottom: 20px; /* Ensure some padding at the bottom of the header */
   border-bottom: #08ff08 3px solid;
+  text-align: center; /* Center header content */
 }
 
 header a {
@@ -85,7 +101,9 @@ header ul {
 
 header li {
   display: inline;
-  padding: 0 20px 0 20px;
+  padding: 0 20px;
 }
+
+
 
 

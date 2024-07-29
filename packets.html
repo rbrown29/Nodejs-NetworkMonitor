@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NodeJs Network Monitor - Packets</title>
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Nodejs Network Monitor</h1>
+      <button onclick="viewHome();">Back</button>
+    </div>
+  </header>
+  <div class="container">
+    <h2>Packets</h2>
+    <ul id="packets"></ul>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    function viewHome() {
+      window.location.href = "/";
+    }
+
+    const socket = io();
+
+    socket.emit('startPacketCapture');
+
+    socket.on("packet", (packet) => {
+      const list = document.getElementById("packets");
+      const item = document.createElement("li");
+      item.textContent = `Src IP: ${packet.srcIp}, Dst IP: ${packet.dstIp}, Src Port: ${packet.srcPort}, Dst Port: ${packet.dstPort}, Protocol: ${packet.protocol}`;
+      list.appendChild(item);
+    });
+  </script>
+</body>
+</html>

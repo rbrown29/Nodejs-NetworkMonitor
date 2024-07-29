@@ -12,94 +12,52 @@
     <header>
       <div class="container">
         <h1>Nodejs Network Monitor</h1>
+        <button onclick="viewPackets();">View Packets</button>
+        <button onclick="viewWiFi();">View WiFi</button>
       </div>
     </header>
     <div class="container">
-      <h2>WiFi Networks</h2>
-      <ul id="networks"></ul>
-      <h2>WiFi Device Alerts</h2>
-      <ul id="alerts"></ul>
       <h2>New Local Network Device Alerts</h2>
       <ul id="new-local-devices"></ul>
       <h2>All Local Network Devices</h2>
       <ul id="all-local-devices"></ul>
-      <h2>Packets</h2>
-      <ul id="packets"></ul>
     </div>
-
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      function viewPackets() {
+        window.location.href = "/packets";
+      }
+
+      function viewWiFi() {
+        window.location.href = "/wifi";
+      }
       const socket = io();
 
-      socket.on("wifiScanResults", (networks) => {
-        const list = document.getElementById("networks");
-        list.innerHTML = "";
+      socket.emit("startLocalNetworkMonitoring");
 
-        networks.forEach((network) => {
+      socket.on("allLocalDevices", (allDevices) => {
+        const list = document.getElementById("all-local-devices");
+        list.innerHTML = "";
+        allDevices.forEach((device) => {
           const item = document.createElement("li");
-          item.textContent = `SSID: ${network.ssid}, Signal Level: ${network.signal_level} dBm`;
+          item.textContent = `IP: ${device.ip}, MAC: ${device.mac}`;
           list.appendChild(item);
         });
       });
 
-      socket.on("newWiFiDeviceAlert", (newDevices) => {
-        console.log("Received newWiFiDeviceAlert:", newDevices);
-        const alerts = document.getElementById("alerts");
-        newDevices.forEach((device) => {
-          const item = document.createElement("li");
-          item.textContent = `New WiFi Device Detected: MAC ${
-            device.mac
-          }, SSID ${device.ssid}, Channel ${device.channel}, Frequency ${
-            device.frequency
-          } MHz, Signal Level ${device.signal_level} dBm, Quality ${
-            device.quality
-          }, Security ${
-            device.security
-          }, Security Flags ${device.security_flags.join(", ")}`;
-          alerts.appendChild(item);
-        });
-      });
-
       socket.on("newLocalDeviceAlert", (newDevices) => {
-        console.log("Received newLocalDeviceAlert:", newDevices);
-        const newDevicesList = document.getElementById("new-local-devices");
-        newDevicesList.innerHTML = ""; // Clear previous alerts
+        const list = document.getElementById("new-local-devices");
+        list.innerHTML = "";
         if (newDevices.length === 0) {
           const item = document.createElement("li");
           item.textContent = "No new devices";
-          newDevicesList.appendChild(item);
+          list.appendChild(item);
         } else {
           newDevices.forEach((device) => {
             const item = document.createElement("li");
-            item.textContent = `New Local Device Detected: IP ${device.ip}, MAC ${device.mac}`;
-            newDevicesList.appendChild(item);
+            item.textContent = `IP: ${device.ip}, MAC: ${device.mac}`;
+            list.appendChild(item);
           });
-        }
-      });
-
-      socket.on("allLocalDevices", (allDevices) => {
-        console.log("Received allLocalDevices:", allDevices);
-        const allDevicesList = document.getElementById("all-local-devices");
-        allDevicesList.innerHTML = ""; // Clear previous list
-        allDevices.forEach((device) => {
-          const item = document.createElement("li");
-          item.textContent = `Local Device: IP ${device.ip}, MAC ${device.mac}`;
-          allDevicesList.appendChild(item);
-        });
-      });
-
-      socket.on("packet", (packet) => {
-        console.log("Received packet:", packet);
-        const packets = document.getElementById("packets");
-        console.log("Packets element:", packets);
-
-        if (packets) {
-          const item = document.createElement("li");
-          item.textContent = `Src IP: ${packet.srcIp}, Dst IP: ${packet.dstIp}, Src Port: ${packet.srcPort}, Dst Port: ${packet.dstPort}, Protocol: ${packet.protocol}`;
-          console.log("Packet item:", item);
-          packets.appendChild(item);
-        } else {
-          console.error("Packets element not found.");
         }
       });
     </script>

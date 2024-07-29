@@ -1,8 +1,6 @@
-// wifiScanner.js
 const wifi = require('node-wifi');
 
 // Initialize wifi module
-// Absolutely necessary even to set interface to null
 wifi.init({
   iface: null // network interface, choose a random wifi interface if set to null
 });
@@ -12,7 +10,8 @@ let knownDevices = new Set();
 function scanWifiNetworks(callback) {
   wifi.scan((err, networks) => {
     if (err) {
-      console.error(err);
+      console.error('Error scanning WiFi networks:', err);
+      callback([], []); // Return empty arrays in case of error
     } else {
       const newDevices = [];
       networks.forEach(network => {
@@ -31,6 +30,8 @@ function scanWifiNetworks(callback) {
           });
         }
       });
+      console.log('Known Devices:', Array.from(knownDevices));
+      console.log('New Devices Detected:', newDevices);
       callback(networks, newDevices);
     }
   });
