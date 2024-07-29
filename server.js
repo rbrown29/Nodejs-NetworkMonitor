@@ -63,13 +63,6 @@ io.on("connection", (socket) => {
       socket.emit("allLocalDevices", allDevices);
     });
   });
-  // Start periodic local network monitoring
-  setInterval(() => {
-    startMonitoring((newDevices, allDevices) => {
-      socket.emit("newLocalDeviceAlert", newDevices);
-      socket.emit("allLocalDevices", allDevices);
-    });
-  }, 300000); // scan every 5 minutes
 });
 
 server.listen(3000, () => {
